@@ -1,0 +1,147 @@
+//-------------------------------------------------------------- 
+//    Author     : Jerome Clerc
+//    Description: 2048js LESS
+//--------------------------------------------------------------
+
+//----- Colors -------------------------------------------------
+@gray-light     :  #e8e8e8;
+@tile-empty     :  #ccc0b4;
+@tile-one       :  #eee4da;
+@tile-two       :  #ede0c8;
+@tile-three     :  #f2b179;
+@tile-four      :  #f59563;
+@tile-five      :  #f67c5f;
+@tile-six       :  #f75e3c;
+@tile-seven     :  #f3d968;
+@tile-eight     :  #edcc61;
+@tile-nine      :  #edc951;
+@tile-ten       :  #e3ba14;
+@tile-eleven    :  #ecc400;
+
+//----- Body --------------------------------------------------
+body {
+    background: @gray-light;
+}
+
+//----- Links -------------------------------------------------
+a {
+    //color: #fff;
+}
+.button {
+    margin: 1.25rem 0 1.25rem 0!important;
+}
+.button.secondary {
+    background-color: #fff!important;
+}
+
+//----- Titles ------------------------------------------------
+h1 {
+    color: #666;
+    font-size: 4em;
+    font-weight: bold;
+}
+
+//----- Game layout --------------------------------------------
+#score, #moves {
+    font-weight: bold;
+}
+#game-wrapper {
+    position: relative;
+
+    #grid-wrapper {
+        background: #fff;
+        padding-top: 0.3rem;
+        padding-bottom: 0.3rem;
+
+        .small-block-grid-4 > li {
+            padding: 0.1rem;
+        }
+
+        .tile {
+            background: @tile-empty;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.8em;
+            line-height: 2em;
+            padding-top: 0.3em;
+            padding-bottom: 0.4em;
+        }
+
+        //----- Tiles backgrounds ----------------------------------
+        .one {
+            background: @tile-one;
+        }
+        .two {
+            background: @tile-two;
+        }
+        .three {
+            background: @tile-three;
+        }
+        .four {
+            background: @tile-four;
+        }
+        .five {
+            background: @tile-five;
+        }
+        .six {
+            background: @tile-six;
+        }
+        .seven {
+            background: @tile-seven;
+        }
+        .eight {
+            background: @tile-eight;
+        }
+        .nine {
+            background: @tile-nine;
+        }
+        .ten {
+            background: @tile-ten;
+        }
+        .eleven {
+            background: @tile-eleven;
+        }
+    }
+
+    //----- End of the game mask -------------------------------
+    .end-game {
+        background: #fff;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0.8;
+        color: #000;
+        font-size: 2.5em;
+        text-align: center;
+        line-height: 8.2em;
+        display: none;
+    }
+}
+
+//----------------------------------------------------------------
+//----- MEDIUM SCREENS -------------------------------------------
+//----------------------------------------------------------------
+@media only screen and (min-width: 40.063em) and (max-width: 64em) {
+    
+}
+
+//----------------------------------------------------------------
+//----- LARGE SCREENS --------------------------------------------
+//----------------------------------------------------------------
+@media only screen and (min-width: 64.063em) {
+    #game-wrapper {
+
+        #grid-wrapper {
+
+            .tile {
+                font-size: 2em;
+            }
+        }
+
+        //----- End of the game mask -------------------------------
+        .end-game {
+            line-height: 9.1em;
+        }
+    }
+}

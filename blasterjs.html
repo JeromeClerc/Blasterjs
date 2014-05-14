@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Blasterjs - by Jerome Clerc</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0" />
+        <link rel="stylesheet" href="css/foundation.min.css" />
+        <link rel="stylesheet" href="css/blasterjs.min.css" />
+    </head>
+    <body>
+        <a href="https://github.com/JeromeClerc/2048js">
+            <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png">
+        </a>
+        <div class="row">
+            <div class="small-11 small-centered medium-5 medium-centered columns">
+                <div class="row">
+                    <div class="small-12 columns text-center">
+                        <h1>Blasterjs</h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="small-6 columns">
+                        <div class="button success expand tiny round"><span id="score">0</span> pts</div>
+                    </div>
+                    <div class="small-6 columns text-right">
+                        <div class="button secondary expand tiny round"><span id="moves">0</span> moves</div>
+                    </div>
+                </div>
+                <div class="row">
+                    <!-- Here comes the game -->
+                    <div id="game-wrapper">
+                        <div class="small-12 columns" id="grid-wrapper"></div>
+                        <div class="end-game"></div>
+                    </div>
+                    <!-- #Here comes the game -->
+                </div>
+                <div class="row">
+                    <div class="small-12 columns text-center">
+                        <a class="button small round" role="new-game">New game</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="small-12 columns text-center">
+                        <img src="images/keyboard.png" class="hide-for-medium-down" style="margin: auto;">
+                        <img src="images/swipe.png" class="show-for-medium-down" style="margin: auto;">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="small-12 columns text-center">
+                        <span class="label secondary radius hide-for-medium-down">Use your arrow keys to play</span>
+                        <span class="label secondary radius show-for-medium-down">Swipe to play</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery.touchSwipe.min.js"></script>
+    <script src="js/blasterjs.min.js"></script>
+</html>
