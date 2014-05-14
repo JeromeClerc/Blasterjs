@@ -297,13 +297,25 @@ $(document).ready(function() {
     }
    
     function newGame() {
+        initGame();
         initGrid();
+        buildGround();
+        
+        /*
+        for(var k in Grid) {
+            console.log(k, Grid[k]["type"]);
+        }
+        */
+       
+       
+        /*
         initMerging();
         initTilesClass();
         initScore();
         initMoves();
-        initGame();
+        
         setRandomTiles(2);
+        */
         $(".end-game").hide();
     }
     
@@ -334,24 +346,34 @@ $(document).ready(function() {
     }
     
     function initGrid() {
-        Grid = {
-            1 : 0,
-            2 : 0,
-            3 : 0,
-            4 : 0,
-            5 : 0,
-            6 : 0,
-            7 : 0,
-            8 : 0,
-            9 : 0,
-            10 : 0,
-            11 : 0,
-            12 : 0,
-            13 : 0,
-            14 : 0,
-            15 : 0,
-            16 : 0
-        };
+        Grid = [];
+        
+        var coordX = 0;
+        var coordY = 0;
+        
+        for(var i = 1; i < 401; i++) {
+            Grid.push({
+                /*id: i,*/
+                type: getTileType(),
+                coordX: coordX,
+                coordY: coordY
+            });
+            
+            if(coordX === parseInt(380)) {
+                coordX = 0;
+            }
+            else {
+                coordX = coordX + 20;
+            }
+            
+            if(i % 20 === 0) {
+                coordY = coordY + 20;
+            }
+        }
+    }
+    
+    function getTileType() {
+        return Math.floor((Math.random() * 3) + 1);
     }
     
     function initMerging() {
@@ -434,11 +456,35 @@ $(document).ready(function() {
         }
     }
     
-    function buildEmptyGrid() {
+    function buildGround() {
+        $("#grid-wrapper").empty();
+        for(var k in Grid) {
+            $("#grid-wrapper").append('<div class="tile" style="top:' + Grid[k]["coordY"] + 'px;left:' + Grid[k]["coordX"] + 'px;"><img src="images/' + getTileBackground(Grid[k]["type"]) + '"></div>');
+        }
+        
+        /*
         $("#grid-wrapper").empty().append('<ul class="small-block-grid-4">');
         for(var i = 1; i < 17; i++) {
             $(".small-block-grid-4").append('<li><div class="tile" id="tile-' + i + '">&nbsp;</div></li>');
         }
         $("#grid-wrapper").append("</ul>");
+        */
+    }
+    
+    function getTileBackground(t) {
+        switch(t) {
+            case 1:
+                var result = 'ground.jpg';
+                break;
+            case 2:
+                var result = 'breakable-wall.jpg';
+                break;
+            case 3:
+                var result = 'unbreakable-wall.jpg';
+                break;
+            default:
+                var result = 'ground.jpg';
+        }
+        return result;
     }
 });

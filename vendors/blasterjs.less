@@ -47,24 +47,20 @@ h1 {
 }
 #game-wrapper {
     position: relative;
+    margin: auto;
 
     #grid-wrapper {
         background: #fff;
-        padding-top: 0.3rem;
-        padding-bottom: 0.3rem;
+        width: 400px;
+        height: 400px;
+        position: relative;
+        z-index: 1;
 
-        .small-block-grid-4 > li {
-            padding: 0.1rem;
-        }
-
-        .tile {
-            background: @tile-empty;
-            text-align: center;
-            font-weight: bold;
-            font-size: 1.8em;
-            line-height: 2em;
-            padding-top: 0.3em;
-            padding-bottom: 0.4em;
+        .tile, .perso, .bomb, .enemy {
+            width: 20px;
+            height: 20px;
+            position: absolute;
+            z-index: 2;
         }
 
         //----- Tiles backgrounds ----------------------------------
