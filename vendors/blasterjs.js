@@ -22,149 +22,74 @@ $(document).ready(function() {
     $(document).on('keyup', function(e) {
         if(Game) {
             if(e.keyCode === KEY_LEFT) {
-                if(!moveLeft()) {
-                    if(!checkIdSlotsAreFull()) {
-                        addOneTile();
-                    }
-                    else {
-                        endOfTheGame(false);
-                    }
-                }
-                else {
-                    addOneTile();
-                }
+                console.log('LEFT');
+                switchDronePic('left');
             }
             if(e.keyCode === KEY_RIGHT) {
-                if(!moveRight()) {
-                    if(!checkIdSlotsAreFull()) {
-                        addOneTile();
-                    }
-                    else {
-                        endOfTheGame(false);
-                    }
-                }
-                else {
-                    addOneTile();
-                }
+                console.log('RIGHT');
+                switchDronePic('right');
             }
             if(e.keyCode === KEY_UP) {
-                if(!moveUp()) {
-                    if(!checkIdSlotsAreFull()) {
-                        addOneTile();
-                    }
-                    else {
-                        endOfTheGame(false);
-                    }
-                }
-                else {
-                    addOneTile();
-                }
+                console.log('UP');
+                switchDronePic('up');
             }
             if(e.keyCode === KEY_DOWN) {
-                if(!moveDown()) {
-                    if(!checkIdSlotsAreFull()) {
-                        addOneTile();
-                    }
-                    else {
-                        endOfTheGame(false);
-                    }
-                }
-                else {
-                    addOneTile();
-                }
-            }
-            if(e.keyCode === KEY_LEFT || e.keyCode === KEY_DOWN || e.keyCode === KEY_UP || e.keyCode === KEY_RIGHT) {
-                addMove();
+                console.log('DOWN');
+                switchDronePic('down');
+                moveDown();
             }
         }
     });
     
-    // Ecoute des swipe
-    $("#grid-wrapper").swipe({
-        swipe:function(event, direction) {
-            if(Game) {
-                if(direction === "left") {
-                    if(!moveLeft()) {
-                        if(!checkIdSlotsAreFull()) {
-                            addOneTile();
-                        }
-                        else {
-                            endOfTheGame(false);
-                        }
-                    }
-                    else {
-                        addOneTile();
-                    }
-                }
-                if(direction === "right") {
-                    if(!moveRight()) {
-                        if(!checkIdSlotsAreFull()) {
-                            addOneTile();
-                        }
-                        else {
-                            endOfTheGame(false);
-                        }
-                    }
-                    else {
-                        addOneTile();
-                    }
-                }
-                if(direction === "up") {
-                    if(!moveUp()) {
-                        if(!checkIdSlotsAreFull()) {
-                            addOneTile();
-                        }
-                        else {
-                            endOfTheGame(false);
-                        }
-                    }
-                    else {
-                        addOneTile();
-                    }
-                }
-                if(direction === "down") {
-                    if(!moveDown()) {
-                        if(!checkIdSlotsAreFull()) {
-                            addOneTile();
-                        }
-                        else {
-                            endOfTheGame(false);
-                        }
-                    }
-                    else {
-                        addOneTile();
-                    }
-                }
-                if(direction === "left" || direction === "right" || direction === "up" || direction === "down") {
-                    addMove();
-                }
-            }
+    function switchDronePic(direction) {
+        if(direction === 'up') {
+            $("#drone").attr("src", "images/drone-top.png");
         }
-    });
+        if(direction === 'down') {
+            $("#drone").attr("src", "images/drone-bot.png");
+        }
+        if(direction === 'left') {
+            $("#drone").attr("src", "images/drone-lft.png");
+        }
+        if(direction === 'right') {
+            $("#drone").attr("src", "images/drone-rgt.png");
+        }
+    }
     
     function moveDown() {
-        for(var i = 1; i < 17; i++) {
-            if(i < 13) {
-                if(parseInt(Grid[i]) !== 0) {
-                    var newN = i + 4;
-                    if(checkIfSlotIsFree(newN)) {
-                        saveTilesPosition(i, newN, Grid[i]);
-                        var result = true;
+        if(!checkIfFree('down')) {
+            //startToMove();
+            console.log('New Drone Y : ' + Drone['coordY']);
+            console.log('Start to move');
+        }
+    }
+    
+    function checkIfFree(direction) {
+        if(direction === 'down' && Drone['coordY'] < 380) {
+            //console.log('Direction = ' + direction + ' CoordY Drone ' + Drone['coordY'] + ' < 380');
+            //console.log('Longeur de Grid : ' + Grid.length);
+            for(var i = 1; i < Grid.length; i++) {
+                //console.log('i = ' + i)
+                //console.log('Grid Y : ' + Grid[i]["coordY"]);
+                //Grid['145']['coordY']
+                
+                if(Grid[i]['coordY'] === Drone['coordY'] + 20) {
+                    if(Grid[i]['type'] === 1) {
+                    console.log('Grid Y = Drone Y + 20');
+                    console.log('Type : ' + Grid[i]['type']);
+                    console.log('terrain libre');
+                    //Drone['coordY'] = Drone['coordY'] + 20;
+                    //checkIfFree('down');
                     }
                     else {
-                        if(parseInt(Grid[i]) === parseInt(Grid[newN])) {
-                            mergeTiles(i, newN, Grid[i]);
-                            var result = true;
-                        }
+                        console.log('terrain occupé');
+                        //return false;
                     }
                 }
             }
         }
-        if(result) {
-            moveDown();
-        }
         else {
-            return false;
+            console.log('Deja tout en bas');
         }
     }
     
@@ -251,7 +176,7 @@ $(document).ready(function() {
             return false;
         }
     }
-   
+    /*
     function checkIdSlotsAreFull() {
         var result = true;
         for(var i = 1; i < 17; i++) {
@@ -281,7 +206,7 @@ $(document).ready(function() {
         addToScore(v);
         setAllTiles();
     }
-    
+    */
     function addToScore(s) {
         var add = s * 10;
         Score = Score + add;
@@ -290,17 +215,19 @@ $(document).ready(function() {
             endOfTheGame(true);
         }
     }
-    
+    /*
     function addMove() {
         Moves = Moves + 1;
         $("#moves").empty().append(Moves);
     }
-   
+    */
     function newGame() {
         initGame();
         initGrid();
         buildGround();
         initDrone();
+        
+        //console.log('Coord start Drone : ' + Drone);
         /*
         for(var k in Grid) {
             console.log(k, Grid[k]["type"]);
@@ -328,7 +255,7 @@ $(document).ready(function() {
             $(".end-game").empty().append("YOU LOOSE :'(").show();
         }
     }
-    
+    /*
     function initTilesClass() {
         TilesClass = {
             2 : "one",
@@ -344,7 +271,7 @@ $(document).ready(function() {
             2048 : "eleven"
         };
     }
-    
+    */
     function initGrid() {
         Grid = [];
         
@@ -378,20 +305,16 @@ $(document).ready(function() {
     
     function initDrone() {
         var k = Math.floor((Math.random() * 400) + 1);
-        console.log('Recherche place libre, slot : ' + k);
         
         if(Grid[k]['type'] !== 1) {
-            console.log(Grid[k]["type"]);
-            console.log('Deja pris');
             initDrone();
         }
         else {
-            console.log('key : ' + k);
-            console.log('type : ' + Grid[k]["type"]);
-            console.log('coordY : ' + Grid[k]["coordY"]);
-            console.log('coordX : ' + Grid[k]["coordX"]);
-            console.log('Terrain libre');
-            $("#grid-wrapper").append('<div class="perso" style="top:' + Grid[k]["coordY"] + 'px;left:' + Grid[k]["coordX"] + 'px;"><img src="images/drone-top.png"></div>');
+            $("#grid-wrapper").append('<div class="perso" style="top:' + Grid[k]["coordY"] + 'px;left:' + Grid[k]["coordX"] + 'px;"><img src="images/drone-top.png" id="drone"></div>');
+            Drone = {
+                coordX : Grid[k]["coordX"],
+                coordY : Grid[k]["coordY"]
+            }
         }
     }
     
@@ -400,15 +323,10 @@ $(document).ready(function() {
         $("#score").empty().append(Score);
     }
     
-    function initMoves() {
-        Moves = 0;
-        $("#moves").empty().append(Moves);
-    }
-    
     function initGame() {
         Game = true;
     }
-    
+    /*
     function setRandomTiles(n) {
         for(var i = 0; i < n; i++) {
             var key = Math.floor((Math.random() * 16) + 1);
@@ -453,20 +371,13 @@ $(document).ready(function() {
             }
         }
     }
-    
+    */
+   
     function buildGround() {
         $("#grid-wrapper").empty();
         for(var k in Grid) {
             $("#grid-wrapper").append('<div class="tile" style="top:' + Grid[k]["coordY"] + 'px;left:' + Grid[k]["coordX"] + 'px;"><img src="images/' + getTileBackground(Grid[k]["type"]) + '"></div>');
         }
-        
-        /*
-        $("#grid-wrapper").empty().append('<ul class="small-block-grid-4">');
-        for(var i = 1; i < 17; i++) {
-            $(".small-block-grid-4").append('<li><div class="tile" id="tile-' + i + '">&nbsp;</div></li>');
-        }
-        $("#grid-wrapper").append("</ul>");
-        */
     }
     
     function getTileBackground(t) {
@@ -475,10 +386,12 @@ $(document).ready(function() {
                 var result = 'ground.jpg';
                 break;
             case 2:
-                var result = 'breakable-wall.jpg';
+                //var result = 'breakable-wall.jpg';
+                var result = 'ground.jpg';
                 break;
             case 3:
-                var result = 'unbreakable-wall.jpg';
+                //var result = 'unbreakable-wall.jpg';
+                var result = 'ground.jpg';
                 break;
             default:
                 var result = 'ground.jpg';
