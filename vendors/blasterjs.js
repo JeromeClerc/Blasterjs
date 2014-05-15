@@ -300,7 +300,7 @@ $(document).ready(function() {
         initGame();
         initGrid();
         buildGround();
-        
+        initDrone();
         /*
         for(var k in Grid) {
             console.log(k, Grid[k]["type"]);
@@ -376,25 +376,23 @@ $(document).ready(function() {
         return Math.floor((Math.random() * 3) + 1);
     }
     
-    function initMerging() {
-        Merging = {
-            1 : true,
-            2 : true,
-            3 : true,
-            4 : true,
-            5 : true,
-            6 : true,
-            7 : true,
-            8 : true,
-            9 : true,
-            10 : true,
-            11 : true,
-            12 : true,
-            13 : true,
-            14 : true,
-            15 : true,
-            16 : true
-        };
+    function initDrone() {
+        var k = Math.floor((Math.random() * 400) + 1);
+        console.log('Recherche place libre, slot : ' + k);
+        
+        if(Grid[k]['type'] !== 1) {
+            console.log(Grid[k]["type"]);
+            console.log('Deja pris');
+            initDrone();
+        }
+        else {
+            console.log('key : ' + k);
+            console.log('type : ' + Grid[k]["type"]);
+            console.log('coordY : ' + Grid[k]["coordY"]);
+            console.log('coordX : ' + Grid[k]["coordX"]);
+            console.log('Terrain libre');
+            $("#grid-wrapper").append('<div class="perso" style="top:' + Grid[k]["coordY"] + 'px;left:' + Grid[k]["coordX"] + 'px;"><img src="images/drone-top.png"></div>');
+        }
     }
     
     function initScore() {
