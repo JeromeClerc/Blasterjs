@@ -8,6 +8,9 @@ $(document).ready(function() {
     KEY_UP      = 38;
     KEY_LEFT	= 37;
     KEY_RIGHT	= 39;
+    KEY_ENTER	= 13;
+    KEY_ESC	= 27;
+    KEY_SPACE	= 32;
     
     // Démarrer un nouveau jeu
     newGame();
@@ -19,194 +22,208 @@ $(document).ready(function() {
     });
     
     // Ecoute des actions clavier
-    $(document).on('keyup', function(e) {
+    $(document).on('keydown', function(e) {
         if(Game) {
+            saveOriginCoordDrone();
+            
             if(e.keyCode === KEY_LEFT) {
                 console.log('LEFT');
                 switchDronePic('left');
+                moveLeft();
             }
             if(e.keyCode === KEY_RIGHT) {
                 console.log('RIGHT');
                 switchDronePic('right');
+                moveRight();
             }
             if(e.keyCode === KEY_UP) {
                 console.log('UP');
                 switchDronePic('up');
+                moveUp();
             }
             if(e.keyCode === KEY_DOWN) {
                 console.log('DOWN');
                 switchDronePic('down');
                 moveDown();
             }
+            if(e.keyCode === KEY_SPACE) {
+                console.log('FIRE');
+                laserFire();
+            }
         }
     });
     
     function switchDronePic(direction) {
         if(direction === 'up') {
-            $("#drone").attr("src", "images/drone-top.png");
+            $("#drone").children("img").attr("src", "images/drone-top.png");
+            Drone['orient'] = 'up';
         }
         if(direction === 'down') {
-            $("#drone").attr("src", "images/drone-bot.png");
+            $("#drone").children("img").attr("src", "images/drone-bot.png");
+            Drone['orient'] = 'down';
         }
         if(direction === 'left') {
-            $("#drone").attr("src", "images/drone-lft.png");
+            $("#drone").children("img").attr("src", "images/drone-lft.png");
+            Drone['orient'] = 'left';
         }
         if(direction === 'right') {
-            $("#drone").attr("src", "images/drone-rgt.png");
+            $("#drone").children("img").attr("src", "images/drone-rgt.png");
+            Drone['orient'] = 'right';
         }
     }
     
     function moveDown() {
         if(!checkIfFree('down')) {
-            //startToMove();
-            console.log('New Drone Y : ' + Drone['coordY']);
-            console.log('Start to move');
-        }
-    }
-    
-    function checkIfFree(direction) {
-        if(direction === 'down' && Drone['coordY'] < 380) {
-            //console.log('Direction = ' + direction + ' CoordY Drone ' + Drone['coordY'] + ' < 380');
-            //console.log('Longeur de Grid : ' + Grid.length);
-            for(var i = 1; i < Grid.length; i++) {
-                //console.log('i = ' + i)
-                //console.log('Grid Y : ' + Grid[i]["coordY"]);
-                //Grid['145']['coordY']
-                
-                if(Grid[i]['coordY'] === Drone['coordY'] + 20) {
-                    if(Grid[i]['type'] === 1) {
-                    console.log('Grid Y = Drone Y + 20');
-                    console.log('Type : ' + Grid[i]['type']);
-                    console.log('terrain libre');
-                    //Drone['coordY'] = Drone['coordY'] + 20;
-                    //checkIfFree('down');
-                    }
-                    else {
-                        console.log('terrain occupé');
-                        //return false;
-                    }
-                }
-            }
-        }
-        else {
-            console.log('Deja tout en bas');
+            animDroneMove('down');
         }
     }
     
     function moveUp() {
-        for(var i = 1; i < 17; i++) {
-            if(i > 4) {
-                if(parseInt(Grid[i]) !== 0) {
-                    var newN = i - 4;
-                    if(checkIfSlotIsFree(newN)) {
-                        saveTilesPosition(i, newN, Grid[i]);
-                        var result = true;
-                    }
-                    else {
-                        if(parseInt(Grid[i]) === parseInt(Grid[newN])) {
-                            mergeTiles(i, newN, Grid[i]);
-                            var result = true;
-                        }
-                    }
-                }
-            }
-        }
-        if(result) {
-            moveUp();
-        }
-        else {
-            return false;
+        if(!checkIfFree('up')) {
+            animDroneMove('up');
         }
     }
-   
+    
     function moveLeft() {
-        for(var i = 1; i < 17; i++) {
-            if(parseInt(i) === 1 || parseInt(i) === 5 || parseInt(i) === 9 || parseInt(i) === 13) {
-                console.log('Already to the left side');
-            }
-            else {
-                if(parseInt(Grid[i]) !== 0) {
-                    var newN = i - 1;
-                    if(checkIfSlotIsFree(newN)) {
-                        saveTilesPosition(i, newN, Grid[i]);
-                        var result = true;
-                    }
-                    else {
-                        if(parseInt(Grid[i]) === parseInt(Grid[newN])) {
-                            mergeTiles(i, newN, Grid[i]);
-                            var result = true;
-                        }
-                    }
-                }
-            }
-        }
-        if(result) {
-            moveLeft();
-        }
-        else {
-            return false;
+        if(!checkIfFree('left')) {
+            animDroneMove('left');
         }
     }
     
     function moveRight() {
-        for(var i = 1; i < 17; i++) {
-            if(parseInt(i) === 4 || parseInt(i) === 8 || parseInt(i) === 12 || parseInt(i) === 16) {
-                console.log('Already to the right side');
+        if(!checkIfFree('right')) {
+            animDroneMove('right');
+        }
+    }
+    
+    function laserFire() {
+        if(Drone['orient'] === 'up') {
+            var y = Drone['coordY'] - 20;
+            var x = Drone['coordX'];
+        }
+        if(Drone['orient'] === 'down') {
+            var y = Drone['coordY'] + 20;
+            var x = Drone['coordX'];
+        }
+        if(Drone['orient'] === 'left') {
+            var y = Drone['coordY'];
+            var x = Drone['coordX'] - 20;
+        }
+        if(Drone['orient'] === 'right') {
+            var y = Drone['coordY'];
+            var x = Drone['coordX'] + 20;
+        }
+        $("#grid-wrapper").append('<div class="fire" style="top:' + y + 'px;left:' + x + 'px;"><img src="images/blast-center.png"></div>');
+        removeBlastedTile(y, x);
+        $('.fire').delay(300).fadeOut('fast');
+    }
+    
+    function animDroneMove(direction) {
+        if(direction === 'down') {
+            $("#drone").animate({top: Drone['coordY'] + 'px'}, getDroneMoveTiming(Drone['coordY'] - DroneOrigin['coordY']));
+        }
+        if(direction === 'up') {
+            $("#drone").animate({top: Drone['coordY'] + 'px'}, getDroneMoveTiming(DroneOrigin['coordY'] - Drone['coordY']));
+        }
+        if(direction === 'left') {
+            $("#drone").animate({left: Drone['coordX'] + 'px'}, getDroneMoveTiming(DroneOrigin['coordX'] - Drone['coordX']));
+        }
+        if(direction === 'right') {
+            $("#drone").animate({left: Drone['coordX'] + 'px'}, getDroneMoveTiming(Drone['coordX'] - DroneOrigin['coordX']));
+        }
+    }
+    
+    function getDroneMoveTiming(delta) {
+        return 300 * (parseInt(delta) / 20);
+    }
+    
+    function saveOriginCoordDrone() {
+        DroneOrigin = {
+                        coordX : Drone['coordX'],
+                        coordY : Drone['coordY']
+                    }
+    }
+    
+    function removeBlastedTile(y, x) {
+        for(var i = 1; i < Grid.length; i++) {
+            if(Grid[i]['coordY'] === y && Grid[i]['coordX'] === x && Grid[i]['type'] === 2) {
+                Grid[i]['type'] = 1;
+                $('#tile-' + i).children("img").attr("src", "images/ground.jpg");
             }
-            else {
-                if(parseInt(Grid[i]) !== 0) {
-                    var newN = i + 1;
-                    if(checkIfSlotIsFree(newN)) {
-                        saveTilesPosition(i, newN, Grid[i]);
-                        var result = true;
+        }
+        //buildGround();
+        //replaceDrone();
+        //replaceGoal();
+    }
+    
+    /*function replaceDrone() {
+        $("#grid-wrapper").append('<div class="goal" id="goal" style="top:' + Drone['coordY'] + 'px;left:' + Drone['coordX'] + 'px;"><img src="images/drone-top.png"></div>');
+        switchDronePic(Drone['orient']);
+    }*/
+    
+    /*function replaceGoal() {
+        $("#grid-wrapper").append('<div class="goal" id="goal" style="top:' + Goal['coordY'] + 'px;left:' + Goal['coordX'] + 'px;"><img src="images/goal.jpg"></div>');
+    }*/
+    
+    function checkIfFree(direction) {
+        if(direction === 'down' && Drone['coordY'] < 380) {
+            for(var i = 1; i < Grid.length; i++) {
+                if(Grid[i]['coordY'] === Drone['coordY'] + 20 && Grid[i]['coordX'] === Drone['coordX']) {
+                    if(Grid[i]['type'] === 1) {
+                        Drone['coordY'] = Drone['coordY'] + 20;
+                        checkIfFree('down');
+                        break;
                     }
                     else {
-                        if(parseInt(Grid[i]) === parseInt(Grid[newN])) {
-                            mergeTiles(i, newN, Grid[i]);
-                            var result = true;
-                        }
+                        return false;
                     }
                 }
             }
         }
-        if(result) {
-            moveRight();
-        }
-        else {
-            return false;
-        }
-    }
-    /*
-    function checkIdSlotsAreFull() {
-        var result = true;
-        for(var i = 1; i < 17; i++) {
-            if(Grid[i] === 0) {
-                result = false;
+        if(direction === 'up' && Drone['coordY'] > 0) {
+            for(var i = 1; i < Grid.length; i++) {
+                if(Grid[i]['coordY'] === Drone['coordY'] - 20 && Grid[i]['coordX'] === Drone['coordX']) {
+                    if(Grid[i]['type'] === 1) {
+                        Drone['coordY'] = Drone['coordY'] - 20;
+                        checkIfFree('up');
+                        break;
+                    }
+                    else {
+                        return false;
+                    }
+                }
             }
         }
-        return result;
-    }
-    
-    function checkIfSlotIsFree(n) {
-        var result = false;
-        if(n < 17 && Grid[n] === 0) {
-            return true;
+        if(direction === 'left' && Drone['coordX'] > 0) {
+            for(var i = 1; i < Grid.length; i++) {
+                if(Grid[i]['coordY'] === Drone['coordY'] && Grid[i]['coordX'] === Drone['coordX'] - 20) {
+                    if(Grid[i]['type'] === 1) {
+                        Drone['coordX'] = Drone['coordX'] - 20;
+                        checkIfFree('left');
+                        break;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+            }
         }
-        return result;
+        if(direction === 'right' && Drone['coordX'] < 380) {
+            for(var i = 1; i < Grid.length; i++) {
+                if(Grid[i]['coordY'] === Drone['coordY'] && Grid[i]['coordX'] === Drone['coordX'] + 20) {
+                    if(Grid[i]['type'] === 1) {
+                        Drone['coordX'] = Drone['coordX'] + 20;
+                        checkIfFree('right');
+                        break;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+            }
+        }
     }
     
-    function saveTilesPosition(i, nexti, v) {
-        Grid[i] = 0;
-        Grid[nexti] = v;
-    }
-    
-    function mergeTiles(i, nexti, v) {
-        Grid[i] = (parseInt(0));
-        Grid[nexti] = (parseInt(v)) + (parseInt(v));
-        addToScore(v);
-        setAllTiles();
-    }
-    */
     function addToScore(s) {
         var add = s * 10;
         Score = Score + add;
@@ -215,34 +232,14 @@ $(document).ready(function() {
             endOfTheGame(true);
         }
     }
-    /*
-    function addMove() {
-        Moves = Moves + 1;
-        $("#moves").empty().append(Moves);
-    }
-    */
+    
     function newGame() {
         initGame();
         initGrid();
         buildGround();
         initDrone();
+        initGoal();
         
-        //console.log('Coord start Drone : ' + Drone);
-        /*
-        for(var k in Grid) {
-            console.log(k, Grid[k]["type"]);
-        }
-        */
-       
-       
-        /*
-        initMerging();
-        initTilesClass();
-        initScore();
-        initMoves();
-        
-        setRandomTiles(2);
-        */
         $(".end-game").hide();
     }
     
@@ -255,23 +252,7 @@ $(document).ready(function() {
             $(".end-game").empty().append("YOU LOOSE :'(").show();
         }
     }
-    /*
-    function initTilesClass() {
-        TilesClass = {
-            2 : "one",
-            4 : "two",
-            8 : "three",
-            16 : "four",
-            32 : "five",
-            64 : "six",
-            128 : "seven",
-            256 : "eight",
-            512 : "nine",
-            1024 : "ten",
-            2048 : "eleven"
-        };
-    }
-    */
+    
     function initGrid() {
         Grid = [];
         
@@ -300,7 +281,18 @@ $(document).ready(function() {
     }
     
     function getTileType() {
-        return Math.floor((Math.random() * 3) + 1);
+        var rand = Math.floor((Math.random() * 100) + 1);
+        
+        if(rand <= 50) {
+            var type = 1;
+        }
+        else if(rand >= 51 && rand <= 75) {
+            var type = 2;
+        }
+        else {
+            var type = 3;
+        }
+        return type;
     }
     
     function initDrone() {
@@ -310,8 +302,24 @@ $(document).ready(function() {
             initDrone();
         }
         else {
-            $("#grid-wrapper").append('<div class="perso" style="top:' + Grid[k]["coordY"] + 'px;left:' + Grid[k]["coordX"] + 'px;"><img src="images/drone-top.png" id="drone"></div>');
+            $("#grid-wrapper").append('<div class="perso" id="drone" style="top:' + Grid[k]["coordY"] + 'px;left:' + Grid[k]["coordX"] + 'px;"><img src="images/drone-top.png"></div>');
             Drone = {
+                coordX : Grid[k]["coordX"],
+                coordY : Grid[k]["coordY"],
+                orient : 'up'
+            }
+        }
+    }
+    
+    function initGoal() {
+         var k = Math.floor((Math.random() * 400) + 1);
+         
+         if(Grid[k]['type'] !== 1) {
+            initGoal();
+        }
+        else {
+            $("#grid-wrapper").append('<div class="goal" id="goal" style="top:' + Grid[k]["coordY"] + 'px;left:' + Grid[k]["coordX"] + 'px;"><img src="images/goal.jpg"></div>');
+            Goal = {
                 coordX : Grid[k]["coordX"],
                 coordY : Grid[k]["coordY"]
             }
@@ -326,57 +334,11 @@ $(document).ready(function() {
     function initGame() {
         Game = true;
     }
-    /*
-    function setRandomTiles(n) {
-        for(var i = 0; i < n; i++) {
-            var key = Math.floor((Math.random() * 16) + 1);
-            var val = Math.floor((Math.random() * 100) + 1);
-            if(Grid[key] !== 0) {
-                setRandomTiles(n);
-            }
-            else {
-                Grid[key] = getNewTileValue(val);
-            }
-        }
-        setAllTiles();
-    }
-    
-    function addOneTile() {
-        var key = Math.floor((Math.random() * 16) + 1);
-        var val = Math.floor((Math.random() * 100) + 1);
-        if(Grid[key] !== 0) {
-            addOneTile();
-        }
-        else {
-            Grid[key] = getNewTileValue(val);
-        }
-        setAllTiles();
-    }
-    
-    function getNewTileValue(v) {
-        if(v < 90) {
-            var value = 2;
-        }
-        else {
-            var value = 4
-        }
-        return value;
-    }
-    
-    function setAllTiles() {
-        buildEmptyGrid();
-        for(var i = 1; i < 17; i++) {
-            if(Grid[i] !== 0) {
-                $("#tile-" + i).addClass(TilesClass[Grid[i]]).empty().append(Grid[i]);
-            }
-        }
-    }
-    */
    
     function buildGround() {
         $("#grid-wrapper").empty();
         for(var k in Grid) {
-            $("#grid-wrapper").append('<div class="tile" style="top:' + Grid[k]["coordY"] + 'px;left:' + Grid[k]["coordX"] + 'px;"><img src="images/' + getTileBackground(Grid[k]["type"]) + '"></div>');
+            $("#grid-wrapper").append('<div class="tile" id="tile-' + k + '" style="top:' + Grid[k]["coordY"] + 'px;left:' + Grid[k]["coordX"] + 'px;"><img src="images/' + getTileBackground(Grid[k]["type"]) + '"></div>');
         }
     }
     
@@ -386,12 +348,12 @@ $(document).ready(function() {
                 var result = 'ground.jpg';
                 break;
             case 2:
-                //var result = 'breakable-wall.jpg';
-                var result = 'ground.jpg';
+                var result = 'breakable-wall.jpg';
+                //var result = 'ground.jpg';
                 break;
             case 3:
-                //var result = 'unbreakable-wall.jpg';
-                var result = 'ground.jpg';
+                var result = 'unbreakable-wall.jpg';
+                //var result = 'ground.jpg';
                 break;
             default:
                 var result = 'ground.jpg';

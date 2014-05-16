@@ -53,10 +53,11 @@ h1 {
         background: #fff;
         width: 400px;
         height: 400px;
+        padding: 0;
         position: relative;
         z-index: 1;
 
-        .tile, .perso, .bomb, .enemy {
+        .tile, .perso, .goal, .fire {
             width: 20px;
             height: 20px;
             position: absolute;
@@ -64,7 +65,7 @@ h1 {
         .tile {
             z-index: 2;
         }
-        .perso, .bomb, .enemy {
+        .perso, .goal, .fire {
             z-index: 3;
         }
 
@@ -132,13 +133,6 @@ h1 {
 //----------------------------------------------------------------
 @media only screen and (min-width: 64.063em) {
     #game-wrapper {
-
-        #grid-wrapper {
-
-            .tile {
-                font-size: 2em;
-            }
-        }
 
         //----- End of the game mask -------------------------------
         .end-game {
