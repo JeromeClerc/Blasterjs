@@ -47,13 +47,14 @@ h1 {
 }
 #game-wrapper {
     position: relative;
-    margin: auto;
+    width: 100%;
 
     #grid-wrapper {
         background: #fff;
         width: 400px;
         height: 400px;
         padding: 0;
+        margin:  0 auto 0 auto;
         position: relative;
         z-index: 1;
 
@@ -62,11 +63,24 @@ h1 {
             height: 20px;
             position: absolute;
         }
-        .tile {
+        .tile, .goal {
             z-index: 2;
         }
-        .perso, .goal, .fire {
+        .perso, .fire {
             z-index: 3;
+        }
+        
+        .power-lvl-content {
+            width: 100%;
+            height: 50px;
+            margin: 12px auto 12px auto;
+            text-align: center;
+            border: 1px solid #000;
+            background: #f00;
+            
+            .power-lvl {
+                
+            }
         }
 
         //----- Tiles backgrounds ----------------------------------

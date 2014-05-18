@@ -75,6 +75,7 @@ $(document).ready(function() {
     function moveDown() {
         if(!checkIfFree('down')) {
             animDroneMove('down');
+            checkifGoalReached();
         }
     }
     
@@ -151,19 +152,7 @@ $(document).ready(function() {
                 $('#tile-' + i).children("img").attr("src", "images/ground.jpg");
             }
         }
-        //buildGround();
-        //replaceDrone();
-        //replaceGoal();
     }
-    
-    /*function replaceDrone() {
-        $("#grid-wrapper").append('<div class="goal" id="goal" style="top:' + Drone['coordY'] + 'px;left:' + Drone['coordX'] + 'px;"><img src="images/drone-top.png"></div>');
-        switchDronePic(Drone['orient']);
-    }*/
-    
-    /*function replaceGoal() {
-        $("#grid-wrapper").append('<div class="goal" id="goal" style="top:' + Goal['coordY'] + 'px;left:' + Goal['coordX'] + 'px;"><img src="images/goal.jpg"></div>');
-    }*/
     
     function checkIfFree(direction) {
         if(direction === 'down' && Drone['coordY'] < 380) {
@@ -221,6 +210,12 @@ $(document).ready(function() {
                     }
                 }
             }
+        }
+    }
+    
+    function checkifGoalReached() {
+        if(Drone['coordX'] === Goal['coordX'] && Drone['coordY'] === Goal['coordY']) {
+            endOfTheGame(true)
         }
     }
     
@@ -359,5 +354,15 @@ $(document).ready(function() {
                 var result = 'ground.jpg';
         }
         return result;
+    }
+    
+    function endOfTheGame(state) {
+        Game = false;
+        if(state === true) {
+            $(".end-game").empty().append("YOU WIN !!!").show();
+        }
+        else {
+            $(".end-game").empty().append("YOU LOOSE :'(").show();
+        }
     }
 });
