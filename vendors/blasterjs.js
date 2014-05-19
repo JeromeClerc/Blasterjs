@@ -27,27 +27,22 @@ $(document).ready(function() {
             saveOriginCoordDrone();
             
             if(e.keyCode === KEY_LEFT) {
-                console.log('LEFT');
                 switchDronePic('left');
                 moveLeft();
             }
             if(e.keyCode === KEY_RIGHT) {
-                console.log('RIGHT');
                 switchDronePic('right');
                 moveRight();
             }
             if(e.keyCode === KEY_UP) {
-                console.log('UP');
                 switchDronePic('up');
                 moveUp();
             }
             if(e.keyCode === KEY_DOWN) {
-                console.log('DOWN');
                 switchDronePic('down');
                 moveDown();
             }
             if(e.keyCode === KEY_SPACE) {
-                console.log('FIRE');
                 laserFire();
             }
         }
@@ -75,7 +70,6 @@ $(document).ready(function() {
     function moveDown() {
         if(!checkIfFree('down')) {
             animDroneMove('down');
-            checkifGoalReached();
         }
     }
     
@@ -98,25 +92,39 @@ $(document).ready(function() {
     }
     
     function laserFire() {
-        if(Drone['orient'] === 'up') {
-            var y = Drone['coordY'] - 20;
-            var x = Drone['coordX'];
+        if(Laser > 0) {
+            if(Drone['orient'] === 'up') {
+                var y = Drone['coordY'] - 20;
+                var x = Drone['coordX'];
+            }
+            if(Drone['orient'] === 'down') {
+                var y = Drone['coordY'] + 20;
+                var x = Drone['coordX'];
+            }
+            if(Drone['orient'] === 'left') {
+                var y = Drone['coordY'];
+                var x = Drone['coordX'] - 20;
+            }
+            if(Drone['orient'] === 'right') {
+                var y = Drone['coordY'];
+                var x = Drone['coordX'] + 20;
+            }
+            $("#grid-wrapper").append('<div class="fire" style="top:' + y + 'px;left:' + x + 'px;"><img src="images/blast-center.png"></div>');
+            removeBlastedTile(y, x);
+            $('.fire').delay(300).fadeOut('fast');
+            adjustLaserLvl('fire');
         }
-        if(Drone['orient'] === 'down') {
-            var y = Drone['coordY'] + 20;
-            var x = Drone['coordX'];
+    }
+    
+    function adjustLaserLvl(value) {
+        if(value === 'fire') {
+            Laser = Laser - 10;
         }
-        if(Drone['orient'] === 'left') {
-            var y = Drone['coordY'];
-            var x = Drone['coordX'] - 20;
+        else {
+            Laser = Laser + 10;
         }
-        if(Drone['orient'] === 'right') {
-            var y = Drone['coordY'];
-            var x = Drone['coordX'] + 20;
-        }
-        $("#grid-wrapper").append('<div class="fire" style="top:' + y + 'px;left:' + x + 'px;"><img src="images/blast-center.png"></div>');
-        removeBlastedTile(y, x);
-        $('.fire').delay(300).fadeOut('fast');
+        $('.power-lvl').animate({width: Laser + '%'}, 'fast');
+        $('.power-lvl-txt').empty().append(Laser + '%');
     }
     
     function animDroneMove(direction) {
@@ -142,7 +150,7 @@ $(document).ready(function() {
         DroneOrigin = {
                         coordX : Drone['coordX'],
                         coordY : Drone['coordY']
-                    }
+                    };
     }
     
     function removeBlastedTile(y, x) {
@@ -150,6 +158,14 @@ $(document).ready(function() {
             if(Grid[i]['coordY'] === y && Grid[i]['coordX'] === x && Grid[i]['type'] === 2) {
                 Grid[i]['type'] = 1;
                 $('#tile-' + i).children("img").attr("src", "images/ground.jpg");
+            }
+            if(Grid[i]['coordY'] === y && Grid[i]['coordX'] === x && Grid[i]['type'] === 4) {
+                Grid[i]['type'] = 1;
+                $('#tile-' + i).children("img").attr("src", "images/ground.jpg");
+            }
+            if(Grid[i]['coordY'] === y && Grid[i]['coordX'] === x && Grid[i]['type'] === 3) {
+                Grid[i]['type'] = 4;
+                $('#tile-' + i).children("img").attr("src", "images/fissured-wall.jpg");
             }
         }
     }
@@ -160,6 +176,8 @@ $(document).ready(function() {
                 if(Grid[i]['coordY'] === Drone['coordY'] + 20 && Grid[i]['coordX'] === Drone['coordX']) {
                     if(Grid[i]['type'] === 1) {
                         Drone['coordY'] = Drone['coordY'] + 20;
+                        checkifGoalReached();
+                        checkIfReloadCrossed();
                         checkIfFree('down');
                         break;
                     }
@@ -174,6 +192,8 @@ $(document).ready(function() {
                 if(Grid[i]['coordY'] === Drone['coordY'] - 20 && Grid[i]['coordX'] === Drone['coordX']) {
                     if(Grid[i]['type'] === 1) {
                         Drone['coordY'] = Drone['coordY'] - 20;
+                        checkifGoalReached();
+                        checkIfReloadCrossed();
                         checkIfFree('up');
                         break;
                     }
@@ -188,6 +208,8 @@ $(document).ready(function() {
                 if(Grid[i]['coordY'] === Drone['coordY'] && Grid[i]['coordX'] === Drone['coordX'] - 20) {
                     if(Grid[i]['type'] === 1) {
                         Drone['coordX'] = Drone['coordX'] - 20;
+                        checkifGoalReached();
+                        checkIfReloadCrossed();
                         checkIfFree('left');
                         break;
                     }
@@ -202,6 +224,8 @@ $(document).ready(function() {
                 if(Grid[i]['coordY'] === Drone['coordY'] && Grid[i]['coordX'] === Drone['coordX'] + 20) {
                     if(Grid[i]['type'] === 1) {
                         Drone['coordX'] = Drone['coordX'] + 20;
+                        checkifGoalReached();
+                        checkIfReloadCrossed();
                         checkIfFree('right');
                         break;
                     }
@@ -215,16 +239,20 @@ $(document).ready(function() {
     
     function checkifGoalReached() {
         if(Drone['coordX'] === Goal['coordX'] && Drone['coordY'] === Goal['coordY']) {
-            endOfTheGame(true)
+            $("#drone").animate({top: Goal['coordY'] + 'px', left: Goal['coordX'] + 'px'}, getDroneMoveTiming(Drone['coordX'] - DroneOrigin['coordX']));
+            endOfTheGame(true);
+            $("#drone").stop(true, true);
         }
     }
     
-    function addToScore(s) {
-        var add = s * 10;
-        Score = Score + add;
-        $("#score").empty().append(Score);
-        if(parseInt(s) === 2048) {
-            endOfTheGame(true);
+    function checkIfReloadCrossed() {
+        for(var k in Reload) {
+            if(Drone['coordX'] === Reload[k]['coordX'] && Drone['coordY'] === Reload[k]['coordY']) {
+                if(Laser < 100) {
+                    adjustLaserLvl('reload');
+                    $('#reload-' + k).remove();
+                }
+            }
         }
     }
     
@@ -234,7 +262,8 @@ $(document).ready(function() {
         buildGround();
         initDrone();
         initGoal();
-        
+        initLaser();
+        initLaserReload();
         $(".end-game").hide();
     }
     
@@ -256,7 +285,6 @@ $(document).ready(function() {
         
         for(var i = 1; i < 401; i++) {
             Grid.push({
-                /*id: i,*/
                 type: getTileType(),
                 coordX: coordX,
                 coordY: coordY
@@ -281,11 +309,14 @@ $(document).ready(function() {
         if(rand <= 50) {
             var type = 1;
         }
-        else if(rand >= 51 && rand <= 75) {
+        else if(rand >= 51 && rand <= 74) {
             var type = 2;
         }
-        else {
+        else if(rand >= 75 && rand <= 98) {
             var type = 3;
+        }
+        else {
+            var type = 4;
         }
         return type;
     }
@@ -307,9 +338,9 @@ $(document).ready(function() {
     }
     
     function initGoal() {
-         var k = Math.floor((Math.random() * 400) + 1);
+        var k = Math.floor((Math.random() * 400) + 1);
          
-         if(Grid[k]['type'] !== 1) {
+        if(Grid[k]['type'] !== 1) {
             initGoal();
         }
         else {
@@ -321,9 +352,38 @@ $(document).ready(function() {
         }
     }
     
-    function initScore() {
-        Score = 0;
-        $("#score").empty().append(Score);
+    function initLaser() {
+        Laser = 100;
+        $(".power-lvl").css({'width' : Laser + '%'});
+        $('.power-lvl-txt').empty().append(Laser + '%');
+    }
+    
+    function initLaserReload() {
+        Reload = [];
+        findReloadPlaces();
+        placeLaserReload();
+    }
+    
+    function placeLaserReload() {
+        for(var k in Reload) {
+            $("#grid-wrapper").append('<div class="reload" id="reload-' + k + '" style="top:' + Reload[k]["coordY"] + 'px;left:' + Reload[k]["coordX"] + 'px;"><img src="images/energy.png"></div>');
+        }
+    }
+    
+    function findReloadPlaces() {
+        while(Reload.length < 4) {
+            var k = Math.floor((Math.random() * 400) + 1);
+            if(Grid[k]['type'] !== 1) {
+                delete k;
+                findReloadPlaces();
+            }
+            else {
+                Reload.push({
+                    coordX: Grid[k]["coordX"],
+                    coordY: Grid[k]["coordY"]
+                });
+            }
+        }
     }
     
     function initGame() {
@@ -344,11 +404,12 @@ $(document).ready(function() {
                 break;
             case 2:
                 var result = 'breakable-wall.jpg';
-                //var result = 'ground.jpg';
                 break;
             case 3:
                 var result = 'unbreakable-wall.jpg';
-                //var result = 'ground.jpg';
+                break;
+            case 4:
+                var result = 'fissured-wall.jpg';
                 break;
             default:
                 var result = 'ground.jpg';
